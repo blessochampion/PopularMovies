@@ -1,6 +1,7 @@
 package com.popularmovies.popularmovies.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -29,7 +31,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class PopularMoviesActivity extends AppCompatActivity implements Response.ErrorListener, Response.Listener<JSONObject> {
+public class PopularMoviesActivity extends AppCompatActivity implements Response.ErrorListener, Response.Listener<JSONObject>, AdapterView.OnItemClickListener {
 
     GridView mGridView;
     TextView mErrorMessageTextView;
@@ -38,8 +40,10 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
     ArrayList<Movie> movies;
     MoviePostersAdapter adapter;
 
-    private static final String KEY_MOVIES = "movies";
+    public static final String KEY_MOVIES = "movies";
+    public static final String KEY_SELECTED_MOVIE = "movie";
     private static final String KEY_ACTION_BAR_TITLE = "title";
+
     private static final String TAG = PopularMoviesActivity.class.getSimpleName();
 
 
@@ -50,6 +54,9 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
         setContentView(R.layout.activity_popular_movies);
 
         mGridView = (GridView) findViewById(R.id.gv_movie_posters);
+
+        mGridView.setOnItemClickListener(this);
+
         mErrorMessageTextView = (TextView) findViewById(R.id.tv_error_message);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
@@ -189,5 +196,17 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
         }
 
 
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Movie selectedMovie = adapter.getItem(position);
+
+        Context context = this;
+        Class classToBeStartedViaIntent = MovieDetailsActivity.class;
+        Intent movieDetailsIntent = new Intent(context, classToBeStartedViaIntent);
+        movieDetailsIntent.putExtra(KEY_SELECTED_MOVIE, selectedMovie);
+
+        startActivity(movieDetailsIntent);
     }
 }

@@ -6,4 +6,6 @@
     <string name="error_unable_to_fetch_movies">Unable to fetch movies</string>
     <string name="popular_movies">Popular Movies</string>
     <string name="top_rated_movies">Top rated movies</string>
+    <string name="movie_details_title">Movie Details</string>
+    <string name="mark_as_favorite">Mark as favorite</string>
 </resources>
