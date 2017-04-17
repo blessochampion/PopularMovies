@@ -12,7 +12,7 @@
         android:columnWidth="120dp"
         android:gravity="center"
         android:horizontalSpacing="0dp"
-        android:numColumns="2"
+        android:numColumns="4"
         android:stretchMode="columnWidth"
         android:verticalSpacing="0dp"
         />
@@ -25,7 +25,7 @@
         android:layout_height="match_parent" />
 
     <ProgressBar
-        android:visibility="invisible"
+        android:visibility="gone"
         android:layout_gravity="center"
         android:id="@+id/pb_loading_indicator"
         android:layout_width="42dp"
