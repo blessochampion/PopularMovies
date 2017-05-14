@@ -36,7 +36,7 @@ public class MoviePostersAdapter extends ArrayAdapter<Movie> {
 
         ImageView posterImageView = (ImageView) convertView.findViewById(R.id.iv_poster);
 
-        String imageBaseURL = NetworkUtils.getPosterImageBaseUrl();
+        String imageBaseURL = NetworkUtils.getPosterImageBaseURL();
         String imageWidthDescription = "w185";
         String fullThumbnailURL = imageBaseURL + imageWidthDescription + currentMovie.getThumbnailURL();
         Picasso.with(context).load(fullThumbnailURL).into(posterImageView);

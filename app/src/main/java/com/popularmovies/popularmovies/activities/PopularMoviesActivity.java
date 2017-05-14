@@ -2,7 +2,11 @@ package com.popularmovies.popularmovies.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -20,7 +24,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.popularmovies.popularmovies.AppController;
 import com.popularmovies.popularmovies.R;
+import com.popularmovies.popularmovies.adapters.FavoriteMoviePostersAdapter;
 import com.popularmovies.popularmovies.adapters.MoviePostersAdapter;
+import com.popularmovies.popularmovies.data.FavoriteMovieContract;
 import com.popularmovies.popularmovies.models.Movie;
 import com.popularmovies.popularmovies.utilities.MovieParser;
 import com.popularmovies.popularmovies.utilities.NetworkUtils;
@@ -31,7 +37,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class PopularMoviesActivity extends AppCompatActivity implements Response.ErrorListener, Response.Listener<JSONObject>, AdapterView.OnItemClickListener {
+public class PopularMoviesActivity extends AppCompatActivity implements Response.ErrorListener,
+        Response.Listener<JSONObject>, AdapterView.OnItemClickListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     GridView mGridView;
     TextView mErrorMessageTextView;
@@ -39,10 +47,13 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
 
     ArrayList<Movie> movies;
     MoviePostersAdapter adapter;
+    FavoriteMoviePostersAdapter mFavoriteMoviePostersAdapter;
+    Cursor mFavoriteMoviesCursor;
 
     public static final String KEY_MOVIES = "movies";
     public static final String KEY_SELECTED_MOVIE = "movie";
     private static final String KEY_ACTION_BAR_TITLE = "title";
+    public static final int LOADER_ID = 100;
 
     private static final String TAG = PopularMoviesActivity.class.getSimpleName();
 
@@ -69,11 +80,7 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
                 showErrorMessage(errorMessage);
 
             } else {
-                String popularMovieUrl = NetworkUtils.getPopularMovieUrl();
-                makeNetworkCallForMovies(popularMovieUrl);
-
-                String popularMovies = getString(R.string.popular_movies);
-                setActionBarTitle(popularMovies);
+                sortMoviesByMostPopular();
             }
 
         } else {
@@ -108,25 +115,42 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
         int selectedSortOrderId = item.getItemId();
 
         if (selectedSortOrderId == R.id.action_sort_by_most_popular) {
-            String url = NetworkUtils.getPopularMovieUrl();
-            makeNetworkCallForMovies(url);
-
-            String popularMovies = getString(R.string.popular_movies);
-            setActionBarTitle(popularMovies);
+            sortMoviesByMostPopular();
 
             return true;
 
         } else if (selectedSortOrderId == R.id.action_sort_by_top_rated) {
-            String url = NetworkUtils.getTopRatedMovieUrl();
-            makeNetworkCallForMovies(url);
-
-            String topRatedMovies = getString(R.string.top_rated_movies);
-            setActionBarTitle(topRatedMovies);
+            sortMoviesByTopRated();
 
             return true;
+        } else if (selectedSortOrderId == R.id.action_sort_by_favorite) {
+            sortMoviesByFavorite();
+
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sortMoviesByMostPopular() {
+        String url = NetworkUtils.getPopularMovieURL();
+        makeNetworkCallForMovies(url);
+
+        String popularMovies = getString(R.string.popular_movies);
+        setActionBarTitle(popularMovies);
+    }
+
+    private void sortMoviesByTopRated() {
+        String url = NetworkUtils.getTopRatedMovieURL();
+        makeNetworkCallForMovies(url);
+
+        String topRatedMovies = getString(R.string.top_rated_movies);
+        setActionBarTitle(topRatedMovies);
+    }
+
+    private void sortMoviesByFavorite() {
+        String favoriteMovies = getString(R.string.favorite_movies);
+        setActionBarTitle(favoriteMovies);
+        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
     private void makeNetworkCallForMovies(String moviesURL) {
@@ -200,7 +224,16 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Movie selectedMovie = adapter.getItem(position);
+        Movie selectedMovie;
+        boolean currentAdapterIsForFavoriteMovies = (adapter == null);
+
+        if (currentAdapterIsForFavoriteMovies) {
+            Cursor currentCursor = (Cursor) mFavoriteMoviePostersAdapter.getItem(position);
+            selectedMovie = MovieParser.parserMovie(currentCursor);
+
+        } else {
+            selectedMovie = adapter.getItem(position);
+        }
 
         Context context = this;
         Class classToBeStartedViaIntent = MovieDetailsActivity.class;
@@ -208,5 +241,75 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
         movieDetailsIntent.putExtra(KEY_SELECTED_MOVIE, selectedMovie);
 
         startActivity(movieDetailsIntent);
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this) {
+
+            Cursor favoriteMovieCursor;
+
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                mLoadingIndicator.setVisibility(View.VISIBLE);
+
+                if (favoriteMovieCursor == null)
+                    forceLoad();
+                else
+                    deliverResult(favoriteMovieCursor);
+            }
+
+            @Override
+            public Cursor loadInBackground() {
+
+                Cursor favoriteMoviesCursor =
+                        getContext().getContentResolver().query(
+                                FavoriteMovieContract.FavoriteMovieEntry.CONTENT_URI, null,
+                                null, null, null
+                        );
+
+                return favoriteMoviesCursor;
+            }
+
+            @Override
+            protected void onStopLoading() {
+                super.onStopLoading();
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        if (data != null) {
+            int count = data.getCount();
+            if (count == 0) {
+                String noFavoriteMoviesInfoMessage = getString(R.string.info_no_favorite_movie);
+                showErrorMessage(noFavoriteMoviesInfoMessage);
+            } else {
+                mFavoriteMoviesCursor = data;
+                Context context = PopularMoviesActivity.this;
+
+                mFavoriteMoviePostersAdapter = new FavoriteMoviePostersAdapter(context, mFavoriteMoviesCursor);
+                adapter = null;
+
+                mGridView.setAdapter(mFavoriteMoviePostersAdapter);
+                mFavoriteMoviePostersAdapter.notifyDataSetChanged();
+
+            }
+
+        } else {
+            String databaseErrorMessage = getString(R.string.error_unable_to_fetch_favorite_movies);
+            showErrorMessage(databaseErrorMessage);
+
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

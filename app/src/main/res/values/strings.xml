@@ -8,4 +8,9 @@
     <string name="top_rated_movies">Top rated movies</string>
     <string name="movie_details_title">Movie Details</string>
     <string name="mark_as_favorite">Mark as favorite</string>
+    <string name="sort_by_favorite">Sort by Favorite</string>
+    <string name="favorite_movies">Favorite Movies</string>
+    <string name="info_no_favorite_movie">No favorite movies added</string>
+    <string name="error_unable_to_fetch_favorite_movies">Unable to fetch favorite movies at the moment</string>
+    <string name="add_favorit_movie_toast_message">Added to favorite movies</string>
 </resources>

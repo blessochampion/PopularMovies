@@ -38,7 +38,6 @@ public class AppController extends Application
     }
 
     public <T> void addToRequestQueue(Request<T> req, String tag){
-        //set the default tag if the tag is empty
         req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
         getRequestQueue().add(req);
     }

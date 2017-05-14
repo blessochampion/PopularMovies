@@ -7,4 +7,7 @@
     <item
         android:id="@+id/action_sort_by_top_rated"
         android:title="@string/sort_by_top_rated" />
+    <item
+        android:id="@+id/action_sort_by_favorite"
+        android:title="@string/sort_by_favorite" />
 </menu>

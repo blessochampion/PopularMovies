@@ -17,7 +17,6 @@
         android:background="@color/movie_details_header"
         android:gravity="center_vertical"
         android:paddingLeft="16dp"
-        android:text="ddddd"
         android:textColor="@color/white"
         android:textSize="24sp" />
 
@@ -39,7 +38,6 @@
         android:layout_below="@id/tv_title"
         android:layout_marginTop="8dp"
         android:layout_toRightOf="@id/iv_poster"
-        android:text="ddddd"
         android:textSize="22sp" />
 
     <TextView
@@ -56,7 +54,6 @@
         android:textSize="16dp"
         android:layout_marginTop="16dp"
         android:id="@+id/tv_ratings"
-        android:text="ddddd"
         android:layout_toRightOf="@id/iv_poster"
         android:layout_below="@id/tv_duration"
         android:layout_width="wrap_content"
@@ -71,7 +68,7 @@
         android:background="@color/movie_details_header"
         android:textColor="@color/white"
         android:text="@string/mark_as_favorite"
-        android:id="@+id/mark_as_favorite"
+        android:id="@+id/btn_mark_as_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
