@@ -4,6 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -14,7 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.popularmovies.popularmovies.R;
+import com.popularmovies.popularmovies.adapters.ViewPagerAdapter;
 import com.popularmovies.popularmovies.data.FavoriteMovieContract;
+import com.popularmovies.popularmovies.fragments.ReviewsFragment;
 import com.popularmovies.popularmovies.models.Movie;
 import com.popularmovies.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
@@ -30,6 +35,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
     TextView mRatings;
     TextView mSynopsis;
     Button mMarkAsFavorite;
+    TabLayout mTabLayout;
+    ViewPager mViewPager;
 
 
     @Override
@@ -50,7 +57,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 insertMovieIntoDatabase();
             }
         });
-
+        mTabLayout = (TabLayout) findViewById(R.id.tl_trailers_reviews);
+        mViewPager = (ViewPager) findViewById(R.id.vp_trailers_reviews);
         enableActionBar();
         setActionBarTitle();
 
@@ -60,9 +68,22 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 movie = intentThatStartedThisActivity.getParcelableExtra(PopularMoviesActivity.KEY_SELECTED_MOVIE);
                 bindData();
             }
+        }else{
+            finish();
         }
 
+        setupViewPager();
+        mTabLayout.setupWithViewPager(mViewPager);
 
+
+    }
+
+    private void setupViewPager() {
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        ViewPagerAdapter adapter = new ViewPagerAdapter(supportFragmentManager);
+        adapter.addFragment(new ReviewsFragment(), "Trailers");
+        adapter.addFragment(new ReviewsFragment(), "Reviews");
+        mViewPager.setAdapter(adapter);
     }
 
     private void setActionBarTitle() {
