@@ -13,4 +13,5 @@
     <string name="info_no_favorite_movie">No favorite movies added</string>
     <string name="error_unable_to_fetch_favorite_movies">Unable to fetch favorite movies at the moment</string>
     <string name="add_favorit_movie_toast_message">Added to favorite movies</string>
+    <string name="trailers">Trailers</string>
 </resources>

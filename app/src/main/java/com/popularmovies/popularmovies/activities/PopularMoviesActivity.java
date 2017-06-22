@@ -53,6 +53,7 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
     public static final String KEY_MOVIES = "movies";
     public static final String KEY_SELECTED_MOVIE = "movie";
     private static final String KEY_ACTION_BAR_TITLE = "title";
+    private static final String KEY_FAVORITE_MOVIE_CURSOR = "cursor";
     public static final int LOADER_ID = 100;
 
     private static final String TAG = PopularMoviesActivity.class.getSimpleName();
@@ -65,37 +66,53 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
         setContentView(R.layout.activity_popular_movies);
 
         mGridView = (GridView) findViewById(R.id.gv_movie_posters);
-
         mGridView.setOnItemClickListener(this);
-
         mErrorMessageTextView = (TextView) findViewById(R.id.tv_error_message);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        Context context = this;
 
-        if (savedInstanceState == null || !savedInstanceState.containsKey(KEY_MOVIES)) {
-            Context context = this;
+        if (activityIsStartingForTheFirstTime(savedInstanceState)) {
+
             boolean userIsConnectedToTheInternet = NetworkUtils.isNetworkAvailable(context);
-
             if (!userIsConnectedToTheInternet) {
                 String errorMessage = getString(R.string.no_network_error_message);
                 showErrorMessage(errorMessage);
-
             } else {
                 sortMoviesByMostPopular();
             }
 
         } else {
-            movies = savedInstanceState.getParcelableArrayList(KEY_MOVIES);
-            Context context = this;
-            adapter = new MoviePostersAdapter(context, movies);
-            mGridView.setAdapter(adapter);
-            showData();
-
-            if(savedInstanceState.containsKey(KEY_ACTION_BAR_TITLE)){
+            if(actionBarTitleWasSaved(savedInstanceState)){
                 String actionBarTitle = savedInstanceState.getString(KEY_ACTION_BAR_TITLE);
                 setActionBarTitle(actionBarTitle);
             }
+
+            if(favoriteMovieCursorWasSaved(savedInstanceState)){
+                getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+                adapter = null;
+
+            }else {
+                movies = savedInstanceState.getParcelableArrayList(KEY_MOVIES);
+                mFavoriteMoviesCursor = null;
+                adapter = new MoviePostersAdapter(context, movies);
+                mGridView.setAdapter(adapter);
+
+            }
+            showData();
         }
 
+    }
+
+    private boolean favoriteMovieCursorWasSaved(Bundle savedInstanceState) {
+        return savedInstanceState.containsKey(KEY_FAVORITE_MOVIE_CURSOR);
+    }
+
+    private boolean actionBarTitleWasSaved(Bundle savedInstanceState) {
+        return savedInstanceState.containsKey(KEY_ACTION_BAR_TITLE);
+    }
+
+    private boolean activityIsStartingForTheFirstTime(Bundle savedInstanceState) {
+        return savedInstanceState == null || !savedInstanceState.containsKey(KEY_MOVIES) || !favoriteMovieCursorWasSaved(savedInstanceState);
     }
 
     private void setActionBarTitle(String title) {
@@ -164,14 +181,17 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        boolean moviesHasBeenDownloadedFromServer = movies != null;
-        if (moviesHasBeenDownloadedFromServer)
+        super.onSaveInstanceState(outState);
+        boolean moviesHasBeenDownloadedFromServer = adapter != null;
+        if (moviesHasBeenDownloadedFromServer) {
             outState.putParcelableArrayList(KEY_MOVIES, movies);
-
+        }
+        else{
+            outState.putInt(KEY_FAVORITE_MOVIE_CURSOR, LOADER_ID);
+        }
         String actionBarTitle = getSupportActionBar().getTitle().toString();
         outState.putString(KEY_ACTION_BAR_TITLE, actionBarTitle);
 
-        super.onSaveInstanceState(outState);
     }
 
     private void showErrorMessage(String errorMessage) {
@@ -231,8 +251,10 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
             Cursor currentCursor = (Cursor) mFavoriteMoviePostersAdapter.getItem(position);
             selectedMovie = MovieParser.parserMovie(currentCursor);
 
+
         } else {
             selectedMovie = adapter.getItem(position);
+            getSupportLoaderManager().destroyLoader(LOADER_ID);
         }
 
         Context context = this;
@@ -282,30 +304,29 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if (data != null) {
-            int count = data.getCount();
-            if (count == 0) {
-                String noFavoriteMoviesInfoMessage = getString(R.string.info_no_favorite_movie);
-                showErrorMessage(noFavoriteMoviesInfoMessage);
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
+            if (data != null) {
+                int count = data.getCount();
+                if (count == 0) {
+                    String noFavoriteMoviesInfoMessage = getString(R.string.info_no_favorite_movie);
+                    showErrorMessage(noFavoriteMoviesInfoMessage);
+                } else {
+                    mFavoriteMoviesCursor = data;
+                    Context context = PopularMoviesActivity.this;
+
+                    mFavoriteMoviePostersAdapter = new FavoriteMoviePostersAdapter(context, mFavoriteMoviesCursor);
+                    adapter = null;
+
+                    mGridView.setAdapter(mFavoriteMoviePostersAdapter);
+                    mFavoriteMoviePostersAdapter.notifyDataSetChanged();
+
+                }
+
             } else {
-                mFavoriteMoviesCursor = data;
-                Context context = PopularMoviesActivity.this;
-
-                mFavoriteMoviePostersAdapter = new FavoriteMoviePostersAdapter(context, mFavoriteMoviesCursor);
-                adapter = null;
-
-                mGridView.setAdapter(mFavoriteMoviePostersAdapter);
-                mFavoriteMoviePostersAdapter.notifyDataSetChanged();
-
-            }
-
-        } else {
-            String databaseErrorMessage = getString(R.string.error_unable_to_fetch_favorite_movies);
-            showErrorMessage(databaseErrorMessage);
+                String databaseErrorMessage = getString(R.string.error_unable_to_fetch_favorite_movies);
+                showErrorMessage(databaseErrorMessage);
 
         }
-
     }
 
     @Override

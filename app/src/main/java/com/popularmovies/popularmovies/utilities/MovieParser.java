@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.popularmovies.popularmovies.data.FavoriteMovieContract;
 import com.popularmovies.popularmovies.models.Movie;
+import com.popularmovies.popularmovies.models.Review;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,6 +23,10 @@ public class MovieParser
     private static final String KEY_RELEASE_DATE = "release_date";
     private static final String KEY_USER_RATING = "vote_average";
     private static final String KEY_MOVIE_ID = "id";
+
+    /*keys for review*/
+    private static final String KEY_REVIEW_AUTHOR = "author";
+    private static final String KEY_REVIEW_CONTENT = "content";
 
     public static  Movie parserMovie(JSONObject movieJSONObject){
         Movie  movie = null;
@@ -69,5 +74,21 @@ public class MovieParser
 
         return movie;
 
+    }
+
+    public Review parseMovieReview(JSONObject review) {
+
+        String author = null, content = null;
+        try {
+
+            author = review.getString(KEY_REVIEW_AUTHOR);
+            content = review.getString(KEY_REVIEW_AUTHOR);
+
+
+        } catch (JSONException je) {
+
+        }
+
+        return new Review(author, content);
     }
 }

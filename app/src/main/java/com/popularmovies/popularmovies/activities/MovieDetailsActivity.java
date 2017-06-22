@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -16,10 +18,13 @@ import android.widget.Toast;
 import com.popularmovies.popularmovies.R;
 import com.popularmovies.popularmovies.data.FavoriteMovieContract;
 import com.popularmovies.popularmovies.models.Movie;
+import com.popularmovies.popularmovies.models.Review;
 import com.popularmovies.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
-public class MovieDetailsActivity extends AppCompatActivity {
+import java.util.List;
+
+public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Review>>{
 
     Movie movie;
 
@@ -141,5 +146,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<List<Review>> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Review>> loader, List<Review> data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Review>> loader) {
+
     }
 }
