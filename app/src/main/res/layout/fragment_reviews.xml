@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:minHeight="40dp"
+        android:text="d,d,nd,d,dddaldlsdkdldlldldldkldkldklllllllllllllllllllllllllllllllllllllldkd
+        dddddddddddddddddddddddddddddddddd
+        dddddddddddddddddddddddddddddddddddd
+        ddddddddddddddddddddd
+        d
+        d
+        d
+        d
+        d
+        ddddddddddddddddddddddddddddddddddddddddddd
+        d
+        d
+        d
+        d
+
+
+
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+        f
+
+        d
+        dmd"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</ScrollView>
