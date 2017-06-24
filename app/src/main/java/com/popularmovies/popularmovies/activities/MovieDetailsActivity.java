@@ -7,8 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -23,16 +21,13 @@ import com.popularmovies.popularmovies.adapters.ViewPagerAdapter;
 import com.popularmovies.popularmovies.data.FavoriteMovieContract;
 import com.popularmovies.popularmovies.fragments.ReviewsFragment;
 import com.popularmovies.popularmovies.models.Movie;
-import com.popularmovies.popularmovies.models.Review;
 import com.popularmovies.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
 
+public class MovieDetailsActivity extends AppCompatActivity {
 
-public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Review>>{
-
-    Movie movie;
+    Movie mMovie;
 
     TextView mTitle;
     ImageView mPosterImageView;
@@ -71,7 +66,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         Intent intentThatStartedThisActivity = getIntent();
         if(intentThatStartedThisActivity != null){
             if(intentThatStartedThisActivity.hasExtra(PopularMoviesActivity.KEY_SELECTED_MOVIE)){
-                movie = intentThatStartedThisActivity.getParcelableExtra(PopularMoviesActivity.KEY_SELECTED_MOVIE);
+                mMovie = intentThatStartedThisActivity.getParcelableExtra(PopularMoviesActivity.KEY_SELECTED_MOVIE);
                 bindData();
             }
         }else{
@@ -87,8 +82,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private void setupViewPager() {
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         ViewPagerAdapter adapter = new ViewPagerAdapter(supportFragmentManager);
-        adapter.addFragment(new ReviewsFragment(), "Trailers");
-        adapter.addFragment(new ReviewsFragment(), "Reviews");
+        adapter.addFragment(ReviewsFragment.getInstance(mMovie.getId()), "Trailers");
+        adapter.addFragment(ReviewsFragment.getInstance(mMovie.getId()), "Reviews");
         mViewPager.setAdapter(adapter);
     }
 
@@ -104,23 +99,23 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
 
     private void bindData() {
-        String title = movie.getTitle();
+        String title = mMovie.getTitle();
         mTitle.setText(title);
 
-        String year = extractYearFromReleaseDate(movie.getReleaseDate());
+        String year = extractYearFromReleaseDate(mMovie.getReleaseDate());
         mYear.setText(year);
 
 
-        String ratings = movie.getUserRating() + "/10";
+        String ratings = mMovie.getUserRating() + "/10";
         mRatings.setText(ratings);
 
-        String synopsis = movie.getSynopsis();
+        String synopsis = mMovie.getSynopsis();
         mSynopsis.setText(synopsis);
 
         Context context = this;
         String imageBaseURL = NetworkUtils.getPosterImageBaseURL();
         String imageWidthDescription = "w185";
-        String fullThumbnailURL = imageBaseURL + imageWidthDescription + movie.getThumbnailURL();
+        String fullThumbnailURL = imageBaseURL + imageWidthDescription + mMovie.getThumbnailURL();
         Picasso.with(context).load(fullThumbnailURL).into(mPosterImageView);
 
     }
@@ -149,12 +144,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private ContentValues parseMovieIntoContentValues() {
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_MOVIE_ID, movie.getId());
-        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
-        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_MOVIE_THUMBNAIL_URL, movie.getThumbnailURL());
-        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_SYNOPSIS, movie.getSynopsis());
-        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
-        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_USER_RATING, movie.getUserRating());
+        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_MOVIE_ID, mMovie.getId());
+        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_MOVIE_TITLE, mMovie.getTitle());
+        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_MOVIE_THUMBNAIL_URL, mMovie.getThumbnailURL());
+        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_SYNOPSIS, mMovie.getSynopsis());
+        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_RELEASE_DATE, mMovie.getReleaseDate());
+        contentValues.put(FavoriteMovieContract.FavoriteMovieEntry.COLUMN_USER_RATING, mMovie.getUserRating());
 
         return contentValues;
     }
@@ -170,18 +165,5 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public Loader<List<Review>> onCreateLoader(int id, Bundle args) {
-        return null;
-    }
 
-    @Override
-    public void onLoadFinished(Loader<List<Review>> loader, List<Review> data) {
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<Review>> loader) {
-
-    }
 }

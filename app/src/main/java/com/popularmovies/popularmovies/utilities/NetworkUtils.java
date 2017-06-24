@@ -17,7 +17,7 @@ public class NetworkUtils {
     private static final String MOVIE_DB_BASE_URL = "https://api.themoviedb.org/3/movie/";
     private static final String POPULAR_MOVIE_URL = MOVIE_DB_BASE_URL + "popular";
     private static final String TOP_RATED_MOVIE_URL = MOVIE_DB_BASE_URL + "top_rated";
-    private static final String MOVIE_REVIEWS_SEGMENT = "review";
+    private static final String MOVIE_REVIEWS_SEGMENT = "reviews";
     static final String API_KEY_PARAM = "api_key";
     static final String POSTER_IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
 

@@ -20,11 +20,16 @@ public class ReviewParser
     private static final String TAG = ReviewParser.class.getSimpleName();
     private static final String KEY_AUTHOR = "author";
     private static final String KEY_CONTENT = "content";
-    public static List<Review> parseReview(JSONArray reviewsArr){
+    private static final String KEY_RESULTS = "results";
+    public static List<Review> parseReview(JSONObject responseFromServer){
+
         String author, content;
         JSONObject currentReview;
         List<Review> reviews =  new ArrayList<>();
         try {
+            JSONArray reviewsArr = responseFromServer.getJSONArray(KEY_RESULTS);
+
+
             for (int i = 0; i < reviewsArr.length(); i++) {
                 currentReview = reviewsArr.getJSONObject(i);
                 author = currentReview.getString(KEY_AUTHOR);

@@ -51,7 +51,7 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
     Cursor mFavoriteMoviesCursor;
 
     public static final String KEY_MOVIES = "movies";
-    public static final String KEY_SELECTED_MOVIE = "movie";
+    public static final String KEY_SELECTED_MOVIE = "mMovie";
     private static final String KEY_ACTION_BAR_TITLE = "title";
     private static final String KEY_FAVORITE_MOVIE_CURSOR = "cursor";
     public static final int LOADER_ID = 100;

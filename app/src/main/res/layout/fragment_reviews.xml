@@ -1,47 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:minHeight="40dp"
-        android:text="d,d,nd,d,dddaldlsdkdldlldldldkldkldklllllllllllllllllllllllllllllllllllllldkd
-        dddddddddddddddddddddddddddddddddd
-        dddddddddddddddddddddddddddddddddddd
-        ddddddddddddddddddddd
-        d
-        d
-        d
-        d
-        d
-        ddddddddddddddddddddddddddddddddddddddddddd
-        d
-        d
-        d
-        d
-
-
-
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-        f
-
-        d
-        dmd"
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/sv_review_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
 
-</ScrollView>
+        <TextView
+            android:id="@+id/tv_reviews"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="40dp"
+            android:paddingTop="4dp"
+            android:text="" />
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/pb_reviews_loading_indicator"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_gravity="center"
+        android:indeterminate="true" />
+
+
+</FrameLayout>
