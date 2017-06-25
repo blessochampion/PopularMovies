@@ -7,8 +7,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -20,12 +23,14 @@ import com.popularmovies.popularmovies.R;
 import com.popularmovies.popularmovies.adapters.ViewPagerAdapter;
 import com.popularmovies.popularmovies.data.FavoriteMovieContract;
 import com.popularmovies.popularmovies.fragments.ReviewsFragment;
+import com.popularmovies.popularmovies.fragments.TrailerFragment;
+import com.popularmovies.popularmovies.interfaces.TrailerIsSharableListener;
 import com.popularmovies.popularmovies.models.Movie;
 import com.popularmovies.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
 
-public class MovieDetailsActivity extends AppCompatActivity {
+public class MovieDetailsActivity extends AppCompatActivity implements TrailerIsSharableListener {
 
     Movie mMovie;
 
@@ -38,6 +43,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
     Button mMarkAsFavorite;
     TabLayout mTabLayout;
     ViewPager mViewPager;
+    MenuItem mShareItem;
+
+    ShareActionProvider mShareActionProvider;
 
 
     @Override
@@ -79,10 +87,24 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.movies_details, menu);
+
+        mShareItem = menu.findItem(R.id.menu_trailer_share);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(mShareItem);
+        mShareItem.setVisible(false);
+        MenuItemCompat.setActionProvider(mShareItem, mShareActionProvider);
+        return true;
+    }
+
+
+
+
     private void setupViewPager() {
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         ViewPagerAdapter adapter = new ViewPagerAdapter(supportFragmentManager);
-        adapter.addFragment(ReviewsFragment.getInstance(mMovie.getId()), "Trailers");
+        adapter.addFragment(TrailerFragment.getInstance(mMovie.getId()), "Trailers");
         adapter.addFragment(ReviewsFragment.getInstance(mMovie.getId()), "Reviews");
         mViewPager.setAdapter(adapter);
     }
@@ -166,4 +188,25 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onFirstTrailerAvailable(String trailerKey) {
+        mShareItem.setVisible(true);
+        String movieUrl = NetworkUtils.getMovieTrailerPreviewURL(trailerKey);
+        setShareIntent(movieUrl);
+    }
+
+    @Override
+    public void noTrailerAvailable() {
+        mShareItem.setVisible(false);
+    }
+
+    private void setShareIntent(String trailerUrl) {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, trailerUrl);
+        shareIntent.setType("text/plain");
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
+    }
 }

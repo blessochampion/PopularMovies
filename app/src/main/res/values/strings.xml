@@ -14,4 +14,9 @@
     <string name="error_unable_to_fetch_favorite_movies">Unable to fetch favorite movies at the moment</string>
     <string name="add_favorit_movie_toast_message">Added to favorite movies</string>
     <string name="trailers">Trailers</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="no_trailer_info">No Trailers Available</string>
+    <string name="no_review_info">No Reviews for this movie</string>
 </resources>

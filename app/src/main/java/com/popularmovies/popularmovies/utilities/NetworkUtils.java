@@ -20,6 +20,9 @@ public class NetworkUtils {
     private static final String MOVIE_REVIEWS_SEGMENT = "reviews";
     static final String API_KEY_PARAM = "api_key";
     static final String POSTER_IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
+    private static final String MOVIE_DB_TRAILER_BASE_URL = "https://www.youtube.com/watch";
+    private static final String MOVIE_DB_TRAILER_PARAMETER = "v";
+    private static final String MOVIE_TRAILERS_SEGMENT = "videos";
 
 
     public static String getPopularMovieURL() {
@@ -59,5 +62,20 @@ public class NetworkUtils {
         return  reviewsUri.toString();
     }
 
+    public static String getMovieTrailerPreviewURL(String key){
+        Uri trailerUrl = Uri.parse(MOVIE_DB_TRAILER_BASE_URL).buildUpon().
+                appendQueryParameter(MOVIE_DB_TRAILER_PARAMETER, key).build();
+
+        return trailerUrl.toString();
+    }
+
+    public static String getMovieTrailerUrl(String movieId){
+        String apiKey = Config.MOVIE_DB_API_KEY;
+        Uri trailersUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
+                .appendPath(movieId).appendPath(MOVIE_TRAILERS_SEGMENT)
+                .appendQueryParameter(API_KEY_PARAM, apiKey).build();
+
+        return  trailersUri.toString();
+    }
 
 }

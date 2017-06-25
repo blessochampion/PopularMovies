@@ -60,7 +60,6 @@ public class ReviewsFragment extends Fragment implements Response.ErrorListener,
     private void makeNetworkCall() {
         String reviewUrl = NetworkUtils.getMovieReviewsURL(mMovieId);
         mReviewLoadingIndicator.setVisibility(View.VISIBLE);
-        Log.e("rr", reviewUrl);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET
                 , reviewUrl, null, this, this
         );
@@ -104,7 +103,11 @@ public class ReviewsFragment extends Fragment implements Response.ErrorListener,
         List<Review> reviews = ReviewParser.parseReview(response);
         mReviewLoadingIndicator.setVisibility(View.GONE);
         mReviewContainer.setVisibility(View.VISIBLE);
-        formatReviews(reviews);
+        if(reviews.isEmpty()){
+            mReviews.setText(getString(R.string.no_review_info));
+        }else {
+            formatReviews(reviews);
+        }
 
 
     }
