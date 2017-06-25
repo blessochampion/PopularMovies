@@ -29,6 +29,10 @@ import com.popularmovies.popularmovies.models.Movie;
 import com.popularmovies.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class MovieDetailsActivity extends AppCompatActivity implements TrailerIsSharableListener {
 
@@ -124,7 +128,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements TrailerIs
         String title = mMovie.getTitle();
         mTitle.setText(title);
 
-        String year = extractYearFromReleaseDate(mMovie.getReleaseDate());
+        String year = formatDate(mMovie.getReleaseDate());
+
         mYear.setText(year);
 
 
@@ -142,9 +147,23 @@ public class MovieDetailsActivity extends AppCompatActivity implements TrailerIs
 
     }
 
-    private String extractYearFromReleaseDate(String releaseDate) {
-        return releaseDate.substring(0, 4);
+    private String formatDate(String dateString){
+        try {
+
+            SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = fmt.parse(dateString);
+
+            SimpleDateFormat fmtOut = new SimpleDateFormat("dd-MM-yyyy");
+            return fmtOut.format(date);
+
+        }catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
+
+
 
     private void insertMovieIntoDatabase(){
 
