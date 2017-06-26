@@ -65,12 +65,13 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_popular_movies);
 
+        //get references to viewstRequest;
         mGridView = (GridView) findViewById(R.id.gv_movie_posters);
         mGridView.setOnItemClickListener(this);
         mErrorMessageTextView = (TextView) findViewById(R.id.tv_error_message);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-        Context context = this;
 
+        Context context = this;
         if (activityIsStartingForTheFirstTime(savedInstanceState)) {
 
             boolean userIsConnectedToTheInternet = NetworkUtils.isNetworkAvailable(context);
@@ -82,14 +83,16 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
             }
 
         } else {
+
             if(actionBarTitleWasSaved(savedInstanceState)){
                 String actionBarTitle = savedInstanceState.getString(KEY_ACTION_BAR_TITLE);
                 setActionBarTitle(actionBarTitle);
             }
 
             if(favoriteMovieCursorWasSaved(savedInstanceState)){
-                getSupportLoaderManager().initLoader(LOADER_ID, null, this);
                 adapter = null;
+                getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
 
             }else {
                 movies = savedInstanceState.getParcelableArrayList(KEY_MOVIES);
@@ -112,7 +115,7 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
     }
 
     private boolean activityIsStartingForTheFirstTime(Bundle savedInstanceState) {
-        return savedInstanceState == null || !savedInstanceState.containsKey(KEY_MOVIES) || !favoriteMovieCursorWasSaved(savedInstanceState);
+        return savedInstanceState == null;
     }
 
     private void setActionBarTitle(String title) {
@@ -286,13 +289,13 @@ public class PopularMoviesActivity extends AppCompatActivity implements Response
             @Override
             public Cursor loadInBackground() {
 
-                Cursor favoriteMoviesCursor =
+                 favoriteMovieCursor =
                         getContext().getContentResolver().query(
                                 FavoriteMovieContract.FavoriteMovieEntry.CONTENT_URI, null,
                                 null, null, null
                         );
 
-                return favoriteMoviesCursor;
+                return favoriteMovieCursor;
             }
 
             @Override
